@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Depth Pro - 单目深度估计</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="bg-effects">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+    
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="logo">◈</span>
+            <span class="brand-text">Depth Pro</span>
+        </div>
+        <div class="nav-links">
+            <a href="/apidocs" target="_blank">API 文档</a>
+            <a href="https://arxiv.org/abs/2410.02073" target="_blank">论文</a>
+            <select id="langSelect" onchange="changeLang(this.value)">
+                <option value="zh-CN">简体中文</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="hero">
+            <div class="hero-badge">Apple ML Research</div>
+            <h1 class="hero-title">
+                <span class="gradient-text">Depth Pro</span>
+            </h1>
+            <p class="hero-subtitle" data-i18n="subtitle">零样本单目深度估计 · 0.3秒生成2.25MP高精度深度图</p>
+            
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="stat-num">0.3s</span>
+                    <span class="stat-desc" data-i18n="stat-speed">推理速度</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="stat-num">2.25MP</span>
+                    <span class="stat-desc" data-i18n="stat-res">输出分辨率</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="stat-num" id="gpuStatNum">-</span>
+                    <span class="stat-desc">GPU</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- 左侧控制面板 -->
+            <aside class="control-panel glass-card">
+                <div class="panel-section">
+                    <h3 class="section-title">
+                        <span class="icon">⚙️</span>
+                        <span data-i18n="params">参数设置</span>
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label data-i18n="colormap">颜色映射</label>
+                        <div class="colormap-grid">
+                            <button class="colormap-btn active" data-value="turbo" title="Turbo">
+                                <span class="colormap-preview turbo"></span>
+                            </button>
+                            <button class="colormap-btn" data-value="viridis" title="Viridis">
+                                <span class="colormap-preview viridis"></span>
+                            </button>
+                            <button class="colormap-btn" data-value="plasma" title="Plasma">
+                                <span class="colormap-preview plasma"></span>
+                            </button>
+                            <button class="colormap-btn" data-value="magma" title="Magma">
+                                <span class="colormap-preview magma"></span>
+                            </button>
+                            <button class="colormap-btn" data-value="inferno" title="Inferno">
+                                <span class="colormap-preview inferno"></span>
+                            </button>
+                            <button class="colormap-btn" data-value="gray" title="Grayscale">
+                                <span class="colormap-preview gray"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="focal-input">焦距设置</label>
+                        <div class="focal-toggle">
+                            <button class="toggle-btn active" data-focal="auto" data-i18n="focal-auto">自动估计</button>
+                            <button class="toggle-btn" data-focal="manual" data-i18n="focal-manual">手动输入</button>
+                        </div>
+                        <div class="focal-manual-input" style="display:none">
+                            <input type="number" id="focalInput" placeholder="焦距 (像素)" min="100" max="10000">
+                            <span class="input-hint" data-i18n="focal-hint">留空则自动估计</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="output-format">输出格式</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="outputJpg" checked>
+                                <span>JPG 可视化</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="outputNpz" checked>
+                                <span>NPZ 原始数据</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="output16bit">
+                                <span>16-bit PNG</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3 class="section-title">
+                        <span class="icon">🖥️</span>
+                        <span>GPU 状态</span>
+                    </h3>
+                    <div class="gpu-card">
+                        <div class="gpu-header">
+                            <span class="gpu-indicator" id="gpuIndicator"></span>
+                            <span class="gpu-name" id="gpuName">检测中...</span>
+                        </div>
+                        <div class="gpu-memory">
+                            <div class="memory-bar">
+                                <div class="memory-fill" id="memoryFill"></div>
+                            </div>
+                            <span class="memory-text" id="memoryText">- / - GB</span>
+                        </div>
+                        <div class="gpu-model-status">
+                            <span data-i18n="model-status">模型状态:</span>
+                            <span id="modelStatus" class="status-badge">-</span>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="offloadGPU()">
+                            <span class="icon">🗑️</span>
+                            <span data-i18n="release-gpu">释放显存</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3 class="section-title">
+                        <span class="icon">💡</span>
+                        <span data-i18n="tips-title">使用技巧</span>
+                    </h3>
+                    <ul class="tips-list">
+                        <li data-i18n="tip1">✓ 室内/近距离场景效果最佳</li>
+                        <li data-i18n="tip2">✓ 高分辨率图像细节更丰富</li>
+                        <li data-i18n="tip3">⚠ 远景(>20m)深度值仅供参考</li>
+                        <li data-i18n="tip4">✓ 支持 JPG/PNG/WebP/HEIC</li>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- 主工作区 -->
+            <main class="workspace">
+                <div class="upload-section glass-card">
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-content" id="uploadContent">
+                            <div class="upload-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            <p class="upload-text" data-i18n="drop-hint">拖拽图像到此处，或点击选择</p>
+                            <p class="upload-subtext">支持 JPG, PNG, WebP, HEIC</p>
+                        </div>
+                        <img id="previewImg" class="preview-image" style="display:none">
+                        <button class="clear-btn" id="clearBtn" style="display:none" onclick="clearImage()">✕</button>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*" style="display:none">
+                    
+                    <div class="action-bar">
+                        <div class="file-info" id="fileInfo"></div>
+                        <button class="btn btn-primary btn-lg" id="processBtn" onclick="process()" disabled>
+                            <span class="btn-icon">▶</span>
+                            <span data-i18n="process">开始处理</span>
+                        </button>
+                    </div>
+                    
+                    <div class="progress-container" id="progressContainer" style="display:none">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <span class="progress-text" id="progressText">准备中...</span>
+                    </div>
+                </div>
+
+                <!-- 结果展示 -->
+                <div class="results-section" id="resultsSection" style="display:none">
+                    <div class="results-header">
+                        <h3 data-i18n="results">处理结果</h3>
+                        <div class="view-toggle">
+                            <button class="view-btn active" data-view="side" title="并排视图">◫</button>
+                            <button class="view-btn" data-view="slider" title="滑动对比">◧</button>
+                            <button class="view-btn" data-view="depth" title="仅深度图">▣</button>
+                        </div>
+                    </div>
+
+                    <div class="comparison-container" id="comparisonContainer">
+                        <div class="image-panel original-panel">
+                            <span class="panel-label" data-i18n="original">原图</span>
+                            <img id="origImg" class="result-image">
+                        </div>
+                        <div class="comparison-slider" id="comparisonSlider" style="display:none">
+                            <div class="slider-handle"></div>
+                        </div>
+                        <div class="image-panel depth-panel">
+                            <span class="panel-label" data-i18n="depth-map">深度图</span>
+                            <img id="depthImg" class="result-image">
+                        </div>
+                    </div>
+
+                    <div class="depth-legend">
+                        <span class="legend-label" data-i18n="near">近</span>
+                        <div class="legend-bar" id="legendBar"></div>
+                        <span class="legend-label" data-i18n="far">远</span>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📏</div>
+                            <div class="stat-content">
+                                <span class="stat-value" id="minDepth">-</span>
+                                <span class="stat-label" data-i18n="min-depth">最近距离</span>
+                            </div>
+                            <span class="stat-unit">m</span>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🔭</div>
+                            <div class="stat-content">
+                                <span class="stat-value" id="maxDepth">-</span>
+                                <span class="stat-label" data-i18n="max-depth">最远距离</span>
+                            </div>
+                            <span class="stat-unit">m</span>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-content">
+                                <span class="stat-value" id="meanDepth">-</span>
+                                <span class="stat-label" data-i18n="mean-depth">平均深度</span>
+                            </div>
+                            <span class="stat-unit">m</span>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📷</div>
+                            <div class="stat-content">
+                                <span class="stat-value" id="focalLen">-</span>
+                                <span class="stat-label" data-i18n="focal">焦距</span>
+                            </div>
+                            <span class="stat-unit">px</span>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏱️</div>
+                            <div class="stat-content">
+                                <span class="stat-value" id="inferTime">-</span>
+                                <span class="stat-label" data-i18n="infer-time">推理耗时</span>
+                            </div>
+                            <span class="stat-unit">s</span>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🖼️</div>
+                            <div class="stat-content">
+                                <span class="stat-value" id="imgSize">-</span>
+                                <span class="stat-label" data-i18n="img-size">图像尺寸</span>
+                            </div>
+                            <span class="stat-unit">px</span>
+                        </div>
+                    </div>
+
+                    <div class="download-section">
+                        <a class="download-btn" id="dlJpg" download>
+                            <span class="dl-icon">🖼️</span>
+                            <span class="dl-text">
+                                <strong>深度图 JPG</strong>
+                                <small>可视化图像</small>
+                            </span>
+                        </a>
+                        <a class="download-btn" id="dlNpz" download>
+                            <span class="dl-icon">📊</span>
+                            <span class="dl-text">
+                                <strong>NPZ 数据</strong>
+                                <small>NumPy 格式</small>
+                            </span>
+                        </a>
+                        <a class="download-btn" id="dl16bit" download style="display:none">
+                            <span class="dl-icon">📐</span>
+                            <span class="dl-text">
+                                <strong>16-bit PNG</strong>
+                                <small>高精度深度</small>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>Depth Pro © Apple Inc. | <a href="https://github.com/apple/ml-depth-pro">GitHub</a> | <a href="https://arxiv.org/abs/2410.02073">arXiv:2410.02073</a></p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

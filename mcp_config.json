@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "depth-pro": {
+      "command": "docker",
+      "args": [
+        "exec", "-i", "depth-pro",
+        "python3", "mcp_server.py"
+      ]
+    }
+  }
+}

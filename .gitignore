@@ -1,0 +1,54 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables (use .env.example as template)
+.env
+!.env.example
+
+# Model checkpoints (download separately)
+checkpoints/*.pt
+checkpoints/*.pth
+checkpoints/*.bin
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+/tmp/
+*.tmp
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Test outputs
+test_output/
+output/
+
+# Docker volumes data
+data/*.npz
+data/*.npy

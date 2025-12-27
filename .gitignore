@@ -52,3 +52,6 @@ output/
 # Docker volumes data
 data/*.npz
 data/*.npy
+
+# WeChat article (not for GitHub)
+公众号文章*.md

